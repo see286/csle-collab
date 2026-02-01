@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  rest-api:
+    image: csle/restapi_clean:v8
+    container_name: csle-rest-api
+    network_mode: "host"
+    environment:
+      - DB_NAME=csle
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - PYTHONPATH=/app
+    restart: always
+    volumes:
+      - /home/li/csle/mini_app.py:/app/app_bridge.py
+    command: gunicorn --bind 0.0.0.0:8080 app_bridge:app
+
+  zookeeper:
+    image: zookeeper:3.8  # 改用官方标准镜像
+    container_name: csle-zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest # 改用最流行的 Kafka 镜像
+    container_name: csle-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+    depends_on:
+      - zookeeper
