@@ -190,3 +190,19 @@ python3 ~/csle/create_fake_data.py
 *生成的 CSV 位于：`~/csle/traces_output_csv/`，已对标 CSLE 标准格式。*（这个我已经生成好了可以用来应急）
 
    > 注意：那个计划也只能做大致参考，我们现在主要是把环境搭出来能跑案例就行，计划里面的一些让我们跑py文件可能我们的电脑里并没有该案例，可以和AI沟通一下通过find指令找到我们文件夹里面真是存在的案例作为平替来运行作为判断环境是否搭建完成的一个检验。
+   >
+
+
+
+## 交接说明
+
+**代码不在 Git 仓库里，在 Venv 库里**： 大家平时改代码在 `~/csle/` 下，但为了让系统跑起来，Li 修改了 **虚拟环境内部** 的第三方库代码。路径在： `~/csle/simulation-system/venv/lib/python3.10/site-packages/csle_common/metastore/metastore_facade.py` **警告**：如果执行 `pip install --upgrade`，这些修复会全部丢失！
+
+**数据是“虚实结合”的**： 目前通过 API 获取到的仿真执行记录（Executions）是 Li 在代码里硬编码进去的。这是为了骗过解析器，让 B 能顺利拿到一个“逻辑对象”去进行下一步的强化学习训练。
+
+**环境运行方式**：
+
+- **组员 B（策略）**：拿到虚拟机后，直接进入虚拟环境。Li 已经把 `csle-agents` 运行所需的“对象模型”缝补好了。你调用 `MetastoreFacade` 时不会报错。
+- **组员 C（可视化）**：你可以直接调用 Li 修复后的 API。Li 已经在 `data` 字典里预留了 `description: "Final Patch by Li v39"`，看到这个就说明环境是 Li 缝补后的稳定版。
+
+**如何跟 AI 交流**： 如果遇到新报错，告诉 AI：*“我们正在使用 CSLE 框架，Li 已经通过修改 `metastore_facade.py` 里的 `from_dict` 解析逻辑绕过了数据库对象不匹配的问题。目前的报错发生在 XXX 层级。”*
